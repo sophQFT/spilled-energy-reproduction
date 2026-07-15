@@ -163,3 +163,26 @@ NVIDIA GeForce RTX 4090
 - `uv run` / `uv sync` は lock と同期するため，**手動パッチは無意味**。lock 側を直す
 - パッケージ管理が壊れたら，継ぎ足しで直すより venv を作り直すほうが確実
 - `uv pip list` は dist-info を見ているだけで，実体があるとは限らない
+
+---
+
+## 補足: uv.lock は git 管理外
+
+原著リポジトリの `.gitignore` に `*.lock` が含まれているため，
+`uv.lock` は git に追跡されていない。
+
+```bash
+git ls-files uv.lock
+# → 何も出力されない（追跡されていない）
+```
+
+```bash
+git check-ignore -v uv.lock
+# → .gitignore:12:*.lock    uv.lock
+```
+
+そのため **lock ファイルの変更はコミットできない**。
+環境固定は `pyproject.toml` 側（`[tool.uv.sources]`）で行う必要がある。
+
+clone した人が `uv lock` を実行すれば，pyproject.toml の指定に従って
+cu128 版に解決されるので，設定の意図は共有される。
